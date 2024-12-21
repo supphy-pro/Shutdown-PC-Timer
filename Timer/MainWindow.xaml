@@ -1,0 +1,58 @@
+﻿<mah:MetroWindow x:Class="Timer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Timer"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        ResizeMode="NoResize"
+        Background="{DynamicResource MahApps.Brushes.Accent}"
+        TitleCharacterCasing="Normal"
+        Title="Power Timer" Height="350" Width="250" Icon="/icon.png">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" Margin="70 0 0 0">
+            <Button Grid.Row="0" Width="35" Height="35" HorizontalAlignment="Right" Margin="0 2 5 0" Padding="0" Click="SettingsOpenClick">
+                <mah:FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE713;"/>
+            </Button>
+            
+        </Grid>
+        <TextBlock Grid.Row="0" Text="Таймер" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30" FontFamily="Bahnschrift SemiBold"/>
+        <TextBlock x:Name="timerTime" Grid.Row="2" Text="00:00:00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" />
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Text="ч" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Margin="0 0 5 0"/>
+            <mah:NumericUpDown  x:Name="timerHours"
+                                Width="75" Height="10"
+                                Minimum="0"
+                                Maximum="23"
+                                Interval="1"
+                                Value="0"
+                                StringFormat="N0"
+                                ValueChanged="ChangeHoursValue"/>
+            <TextBlock Text="мин" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Margin="5 0"/>
+            <mah:NumericUpDown x:Name="timerMinutes"
+                    Width="75" Height="10"
+                    Minimum="0"
+                    Maximum="59"
+                    Interval="1"
+                    Value="0"
+                    StringFormat="N0"
+                    ValueChanged="ChangeMinutesValue"/>
+        </StackPanel>
+        <ComboBox x:Name="timerAction" Grid.Row="4" Width="150" Height="30">
+            <ComboBoxItem>Завершение работы</ComboBoxItem>
+            <ComboBoxItem>Перезагрузка</ComboBoxItem>
+            <ComboBoxItem>Сон</ComboBoxItem>
+        </ComboBox>
+        <Button x:Name="timerStartButton" Grid.Row="5" Margin="5" Click="StartTimerClick">Запустить</Button>
+        <Button x:Name="timerCancelButton" Grid.Row="5" Margin="5" Click="CancelTimerClick" Visibility="Collapsed">Отменить</Button>
+    </Grid>
+</mah:MetroWindow>
