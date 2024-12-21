@@ -1,24 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 
 namespace Timer
 {
     public partial class SettingsWindow : MetroWindow
     {
-
         public SettingsWindow()
         {
             InitializeComponent();
@@ -27,25 +19,20 @@ namespace Timer
 
         private void LoadLanguage()
         {
-            string language = ConfigurationManager.AppSettings["Language"];
-            if (language.Equals("Русский"))
-            {
-                settingsLanguage.SelectedIndex = 0;
-            }
-            else if (language.Equals("English"))
-            {
-                settingsLanguage.SelectedIndex = 1;
-            }
+            string currentLanguage = ConfigurationManager.AppSettings["Language"];
+            var matchingItem = settingsLanguage.Items
+                .Cast<ComboBoxItem>()
+                .FirstOrDefault(item => (string)item.Content == currentLanguage);
+            if (matchingItem != null)
+                settingsLanguage.SelectedItem = matchingItem;
         }
 
-        private void SaveLanguage()
+        private void SaveLanguage(string _language)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["Language"].Value = settingsLanguage.Text;
+            config.AppSettings.Settings["Language"].Value = _language;
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
-            MessageBox.Show(settingsLanguage.Text);
-            MessageBox.Show(ConfigurationManager.AppSettings["Language"]);
         }
 
         private void CheckboxLastTimerClick(object sender, RoutedEventArgs e)
@@ -80,7 +67,8 @@ namespace Timer
 
         private void ComboboxLanguageChange(object sender, SelectionChangedEventArgs e)
         {
-            SaveLanguage();
+            if (settingsLanguage.SelectedItem is ComboBoxItem selectedItem)
+                SaveLanguage(selectedItem.Content.ToString());
         }
     }
 }
