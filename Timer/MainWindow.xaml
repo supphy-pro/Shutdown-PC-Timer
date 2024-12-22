@@ -25,10 +25,10 @@
             </Button>
             
         </Grid>
-        <TextBlock Grid.Row="0" Text="Таймер" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30" FontFamily="Bahnschrift SemiBold"/>
+        <TextBlock x:Name="mainTitle" Grid.Row="0" Text="Таймер" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30" FontFamily="Bahnschrift SemiBold"/>
         <TextBlock x:Name="timerTime" Grid.Row="2" Text="00:00:00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40" />
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Text="ч" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Margin="0 0 5 0"/>
+            <TextBlock x:Name="mainHoursText" Text="ч" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Margin="0 0 5 0"/>
             <mah:NumericUpDown  x:Name="timerHours"
                                 Width="75" Height="10"
                                 Minimum="0"
@@ -37,7 +37,7 @@
                                 Value="0"
                                 StringFormat="N0"
                                 ValueChanged="ChangeHoursValue"/>
-            <TextBlock Text="мин" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Margin="5 0"/>
+            <TextBlock x:Name="mainMinutesText" Text="мин" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" Margin="5 0"/>
             <mah:NumericUpDown x:Name="timerMinutes"
                     Width="75" Height="10"
                     Minimum="0"
@@ -48,9 +48,9 @@
                     ValueChanged="ChangeMinutesValue"/>
         </StackPanel>
         <ComboBox x:Name="timerAction" Grid.Row="4" Width="150" Height="30">
-            <ComboBoxItem>Завершение работы</ComboBoxItem>
-            <ComboBoxItem>Перезагрузка</ComboBoxItem>
-            <ComboBoxItem>Сон</ComboBoxItem>
+            <ComboBoxItem x:Name="mainShutdown">Завершение работы</ComboBoxItem>
+            <ComboBoxItem x:Name="mainRestart">Перезагрузка</ComboBoxItem>
+            <ComboBoxItem x:Name="mainSleep">Сон</ComboBoxItem>
         </ComboBox>
         <Button x:Name="timerStartButton" Grid.Row="5" Margin="5" Click="StartTimerClick">Запустить</Button>
         <Button x:Name="timerCancelButton" Grid.Row="5" Margin="5" Click="CancelTimerClick" Visibility="Collapsed">Отменить</Button>

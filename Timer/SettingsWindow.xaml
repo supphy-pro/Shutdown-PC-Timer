@@ -16,16 +16,16 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Margin="7">
-            <CheckBox x:Name="settingsLastTimer" Content="Запоминать последний таймер" Click="CheckboxLastTimerClick" />
+            <CheckBox x:Name="settingsLastTimer" Content="Запоминать последнее время таймера" Click="CheckboxLastTimerClick" />
             <CheckBox x:Name="settingsLastType" Content="Запоминать тип таймера" Click="CheckboxLastTypeClick" />
             <CheckBox x:Name="settingsDeleteTimer" Content="Удалять таймер после срабатывания" IsChecked="True" Click="CheckboxDeleteTimerClick" />
             <CheckBox x:Name="settingsAutorun" Content="Автозапуск программы" Click="CheckboxAutorunClick" />
             <CheckBox x:Name="settingsBackground" Content="Работа в фоне" Click="CheckboxBackgroundClick" />
             <CheckBox x:Name="settingsTopmost" Content="Поверх всех окон" Click="CheckboxTopmostClick" />
-            <TextBlock Text="Язык программы" Margin="0 5 0 0"/>
+            <TextBlock x:Name="settingsLanguageText" Text="Язык программы" Margin="0 5 0 0"/>
             <ComboBox x:Name="settingsLanguage" SelectionChanged="ComboboxLanguageChange">
-                <ComboBoxItem Content="Русский"/>
-                <ComboBoxItem Content="English"/>
+                <ComboBoxItem Content="Русский" Tag="ru"/>
+                <ComboBoxItem Content="English" Tag="en"/>
             </ComboBox>
         </StackPanel>
     </Grid>

@@ -118,48 +118,48 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="MainCancel" xml:space="preserve">
-    <value>ОТМЕНИТЬ</value>
+    <value>CANCEL</value>
   </data>
   <data name="MainHours" xml:space="preserve">
-    <value>ч</value>
+    <value>h</value>
   </data>
   <data name="MainMinutes" xml:space="preserve">
-    <value>мин</value>
+    <value>min</value>
   </data>
   <data name="MainRestart" xml:space="preserve">
-    <value>Перезагрузка</value>
+    <value>Restart</value>
   </data>
   <data name="MainShutdown" xml:space="preserve">
-    <value>Завершение работы</value>
+    <value>Shutdown</value>
   </data>
   <data name="MainSleep" xml:space="preserve">
-    <value>Сон</value>
+    <value>Sleep</value>
   </data>
   <data name="MainStart" xml:space="preserve">
-    <value>ЗАПУСТИТЬ</value>
+    <value>START</value>
   </data>
   <data name="MainTitle" xml:space="preserve">
-    <value>Таймер</value>
+    <value>Timer</value>
   </data>
   <data name="SettingsAutorun" xml:space="preserve">
-    <value>Автозапуск программы</value>
+    <value>Autorun of the program</value>
   </data>
   <data name="SettingsBackground" xml:space="preserve">
-    <value>Работа в фоне</value>
+    <value>Working in the background</value>
   </data>
   <data name="SettingsDeleteTimer" xml:space="preserve">
-    <value>Удалять таймер после срабатывания</value>
+    <value>Delete the timer after it's triggered</value>
   </data>
   <data name="SettingsLanguageText" xml:space="preserve">
-    <value>Язык программы</value>
+    <value>Program language</value>
   </data>
   <data name="SettingsLastTimer" xml:space="preserve">
-    <value>Запоминать последний таймер</value>
+    <value>Remember the last timer</value>
   </data>
   <data name="SettingsLastType" xml:space="preserve">
-    <value>Запоминать тип таймера</value>
+    <value>Remember the type of timer</value>
   </data>
   <data name="SettingsTopmost" xml:space="preserve">
-    <value>Поверх всех окон</value>
+    <value>On top of all windows</value>
   </data>
 </root>

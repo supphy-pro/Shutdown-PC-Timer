@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Documents;
 using MahApps.Metro.Controls;
 
 namespace Timer
@@ -109,7 +110,7 @@ namespace Timer
 
         private void SettingsOpenClick(object sender, RoutedEventArgs e)
         {
-            settingsWindow = new SettingsWindow();
+            settingsWindow = new SettingsWindow(this);
             settingsWindow.ShowDialog();
         }
 
