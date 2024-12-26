@@ -9,7 +9,7 @@
         ResizeMode="NoResize"
         Background="{DynamicResource MahApps.Brushes.Accent}"
         TitleCharacterCasing="Normal"
-        Title="Power Timer" Height="350" Width="250" Icon="/icon.png">
+        Title="Power Timer" Height="350" Width="250" Icon="/icon.png" StateChanged="OnStateChanged" Closing="OnClosing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>

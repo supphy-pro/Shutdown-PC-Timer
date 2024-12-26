@@ -2,8 +2,11 @@
 using System.Configuration;
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Documents;
 using MahApps.Metro.Controls;
+using System.Windows.Forms;
+using System.IO;
+using System.Drawing;
+using System.Windows.Media.Imaging;
 
 namespace Timer
 {
@@ -12,12 +15,69 @@ namespace Timer
         SettingsWindow settingsWindow;
         private System.Timers.Timer countdownTimer;
         private DateTime? endTime;
+        private NotifyIcon _notifyIcon;
+
         public MainWindow()
         {
             InitializeComponent();
+            SetDefaults();
             LoadTimerData();
             StartCountdown();
             LoadSettings();
+            InitializeTrayIcon();
+        }
+        private void InitializeTrayIcon()
+        {
+            BitmapImage bitmapImage = new BitmapImage(new Uri("pack://application:,,,/icon.png"));
+            Icon icon = ConvertBitmapImageToIcon(bitmapImage);
+            _notifyIcon = new NotifyIcon
+            {
+                Icon = icon,
+                Visible = true,
+                Text = "Power Timer"
+            };
+            _notifyIcon.ContextMenuStrip = new ContextMenuStrip();
+            _notifyIcon.ContextMenuStrip.Items.Add("Открыть", null, (s, e) => ShowWindow());
+            _notifyIcon.ContextMenuStrip.Items.Add("Выход", null, (s, e) => CloseApplication());
+            _notifyIcon.DoubleClick += (s, e) => ShowWindow();
+        }
+
+        public static Icon ConvertBitmapImageToIcon(BitmapImage bitmapImage)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+                encoder.Save(memoryStream);
+                using (Bitmap bitmap = new Bitmap(memoryStream))
+                {
+                    return System.Drawing.Icon.FromHandle(bitmap.GetHicon());
+                }
+            }
+        }
+
+        private void ShowWindow()
+        {
+            Show();
+            WindowState = WindowState.Normal;
+            Activate();
+        }
+
+        private void CloseApplication()
+        {
+            _notifyIcon.Dispose();
+            _notifyIcon = null;
+            System.Windows.Application.Current.Shutdown();
+        }
+
+        private void SetDefaults()
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (ConfigurationManager.AppSettings["Topmost"] == null || ConfigurationManager.AppSettings["Topmost"] == "")
+                config.AppSettings.Settings["Topmost"].Value = "0";
+            if (ConfigurationManager.AppSettings["SavedAction"] == null)
+                config.AppSettings.Settings["SavedAction"].Value = null;
+            config.Save(ConfigurationSaveMode.Modified);
         }
 
         private void SaveTimerData()
@@ -48,9 +108,14 @@ namespace Timer
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             string hours = timerHours.Value < 10 ? $"0{(int)timerHours.Value}" : ((int)timerHours.Value).ToString();
             string minutes = timerMinutes.Value < 10 ? $"0{(int)timerMinutes.Value}" : ((int)timerMinutes.Value).ToString();
-            config.AppSettings.Settings["SavedTimer"].Value = $"{hours}:{minutes}";
-            config.Save(ConfigurationSaveMode.Modified);
-            config.AppSettings.Settings["SavedAction"].Value = timerAction.Text;
+            if (config.AppSettings.Settings["SavedTimer"].Value != null && config.AppSettings.Settings["SavedTimer"].Value != "")
+                config.AppSettings.Settings["SavedTimer"].Value = $"{hours}:{minutes}";
+            else
+                config.AppSettings.Settings["SavedTimer"].Value = null;
+            if (config.AppSettings.Settings["SavedAction"].Value != null && config.AppSettings.Settings["SavedAction"].Value != "")
+                config.AppSettings.Settings["SavedAction"].Value = timerAction.SelectedIndex.ToString();
+            else 
+                config.AppSettings.Settings["SavedAction"].Value = null;
             config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection("appSettings");
         }
@@ -59,14 +124,19 @@ namespace Timer
         {
             string savedTimer = ConfigurationManager.AppSettings["SavedTimer"];
             string savedAction = ConfigurationManager.AppSettings["SavedAction"];
+            string isTopmost = ConfigurationManager.AppSettings["Topmost"];
             if (savedTimer != "" && savedTimer != null)
             {
                 timerHours.Value = double.Parse(savedTimer.Split(':')[0]);
                 timerMinutes.Value = double.Parse(savedTimer.Split(':')[1]);
             }
-            if (savedAction != "" && savedTimer != null)
+            if (savedAction != "" && savedAction != null)
             {
-                timerAction.Text = savedTimer;
+                timerAction.SelectedIndex = int.Parse(savedAction);
+            }
+            if (isTopmost != null && isTopmost.Equals("1"))
+            {
+                Topmost = true;
             }
         }
 
@@ -104,7 +174,6 @@ namespace Timer
                 minutes += (int)timerMinutes.Value;
             if (minutes > 0)
                 return minutes;
-            MessageBox.Show("Введите корректное положительное число минут.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             throw new InvalidOperationException("Некорректное время.");
         }
 
@@ -177,10 +246,7 @@ namespace Timer
                 timerMinutes.IsEnabled = true;
                 timerAction.IsEnabled = true;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при отмене задач: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            catch { }
         }
 
         private void CancelTask(string taskName)
@@ -204,7 +270,11 @@ namespace Timer
         {
             try
             {
-                var startTime = DateTime.Now.AddMinutes(minutes);
+                DateTime startTime;
+                if (DateTime.Now.Second <= 20)
+                    startTime = DateTime.Now.AddMinutes(minutes);
+                else
+                    startTime = DateTime.Now.AddMinutes(minutes + 1);
                 string arguments = $"/Create /TN \"{taskName}\" /TR \"{command}\" /SC ONCE /ST {startTime:HH:mm} /F";
 
                 var process = new Process
@@ -221,10 +291,7 @@ namespace Timer
                 process.Start();
                 process.WaitForExit();
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при планировании задачи: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            catch { }
         }
 
         private void ChangeHoursValue(object sender, RoutedPropertyChangedEventArgs<double?> e)
@@ -247,6 +314,29 @@ namespace Timer
                 if (minutes.Equals(""))
                     minutes = "00";
                 timerTime.Text = $"{timerTime.Text.Split(':')[0]}:{minutes}:00";
+            }
+        }
+
+        private void OnStateChanged(object sender, EventArgs e)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (config.AppSettings.Settings["BackgroundWork"].Value != null && config.AppSettings.Settings["BackgroundWork"].Value != "")
+            {
+                base.OnStateChanged(e);
+                if (WindowState == WindowState.Minimized)
+                {
+                    Hide();
+                }
+            }
+        }
+
+        private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (config.AppSettings.Settings["BackgroundWork"].Value != null && config.AppSettings.Settings["BackgroundWork"].Value != "")
+            {
+                e.Cancel = true;
+                Hide();
             }
         }
     }

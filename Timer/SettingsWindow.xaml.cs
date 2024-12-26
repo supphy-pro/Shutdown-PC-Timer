@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Globalization;
@@ -9,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Windows;
 using System.Windows.Controls;
 using MahApps.Metro.Controls;
+using Microsoft.Win32;
 
 namespace Timer
 {
@@ -20,10 +22,10 @@ namespace Timer
         {
             InitializeComponent();
             _mainWindow = mainWindow;
-            LoadLanguage();
+            LoadSettings();
         }
 
-        private void LoadLanguage()
+        private void LoadSettings()
         {
             string savedLanguage = Properties.Settings.Default.AppLanguage;
             SetLanguage(savedLanguage);
@@ -35,6 +37,18 @@ namespace Timer
                     break;
                 }
             }
+
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (config.AppSettings.Settings["Topmost"].Value == "1")
+                settingsTopmost.IsChecked = true;
+            if (config.AppSettings.Settings["SavedAction"].Value != null && config.AppSettings.Settings["SavedAction"].Value != "")
+                settingsLastType.IsChecked = true;
+            if (config.AppSettings.Settings["SavedTimer"].Value != null && config.AppSettings.Settings["SavedTimer"].Value != "")
+                settingsLastTimer.IsChecked = true;
+            if (config.AppSettings.Settings["Autorun"].Value != null && config.AppSettings.Settings["Autorun"].Value != "")
+                settingsAutorun.IsChecked = true;
+            if (config.AppSettings.Settings["BackgroundWork"].Value != null && config.AppSettings.Settings["BackgroundWork"].Value != "")
+                settingsBackground.IsChecked = true;
         }
 
         private void SetLanguage(string languageCode)
@@ -61,12 +75,18 @@ namespace Timer
 
         private void CheckboxLastTimerClick(object sender, RoutedEventArgs e)
         {
-
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (settingsLastTimer.IsChecked == true) config.AppSettings.Settings["SavedTimer"].Value = "00:00";
+            else config.AppSettings.Settings["SavedTimer"].Value = null;
+            config.Save(ConfigurationSaveMode.Modified);
         }
 
         private void CheckboxLastTypeClick(object sender, RoutedEventArgs e)
         {
-
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (settingsLastType.IsChecked == true) config.AppSettings.Settings["SavedAction"].Value = "2";
+            else config.AppSettings.Settings["SavedAction"].Value = null;
+            config.Save(ConfigurationSaveMode.Modified);
         }
 
         private void CheckboxDeleteTimerClick(object sender, RoutedEventArgs e)
@@ -76,17 +96,65 @@ namespace Timer
 
         private void CheckboxAutorunClick(object sender, RoutedEventArgs e)
         {
-
+            string appName = "Power Timer";
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (settingsAutorun.IsChecked == true)
+            {
+                config.AppSettings.Settings["Autorun"].Value = "1";
+                
+                string appPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                try
+                {
+                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
+                    {
+                        key?.SetValue(appName, appPath);
+                    }
+                }
+                catch { }
+            }
+            else
+            {
+                config.AppSettings.Settings["Autorun"].Value = null;
+                try
+                {
+                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
+                    {
+                        if (key != null && key.GetValue(appName) != null) key.DeleteValue(appName);
+                    }
+                }
+                catch { }
+            }
+            config.Save(ConfigurationSaveMode.Modified);
         }
 
         private void CheckboxBackgroundClick(object sender, RoutedEventArgs e)
         {
-
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (settingsBackground.IsChecked == true)
+            {
+                config.AppSettings.Settings["BackgroundWork"].Value = "1";
+            }
+            else
+            {
+                config.AppSettings.Settings["BackgroundWork"].Value = null;
+            }
+            config.Save(ConfigurationSaveMode.Modified);
         }
 
         private void CheckboxTopmostClick(object sender, RoutedEventArgs e)
         {
-
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (settingsTopmost.IsChecked == true)
+            {
+                config.AppSettings.Settings["Topmost"].Value = "1";
+                _mainWindow.Topmost = true;
+            }
+            else
+            {
+                config.AppSettings.Settings["Topmost"].Value = "0";
+                _mainWindow.Topmost = false;
+            }
+            config.Save(ConfigurationSaveMode.Modified);
         }
 
         private void ComboboxLanguageChange(object sender, SelectionChangedEventArgs e)
